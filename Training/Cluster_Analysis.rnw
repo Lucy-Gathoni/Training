@@ -1,0 +1,343 @@
+\documentclass[10pt]{beamer}
+\usetheme{CambridgeUS}
+\setbeamercolor{itemize item}{bg=green}
+\setbeamertemplate{enumerate item}[default]
+\setbeamertemplate{navigation symbols}{}
+\setbeamercovered{transparent}
+\setbeamercolor{block title}{fg=blue}
+\setbeamercolor{local structure}{fg=darkred}
+\setbeamertemplate{itemize item}[triangle]
+
+% \mode<presentation>
+% {
+%   \usetheme{CambridgeUS}      % or try Darmstadt, Madrid, Warsaw, ...
+%   \usecolortheme{default} % or try albatross, beaver, crane, ...
+%   \usefonttheme{default}  % or try serif, structurebold, ...
+%   \setbeamertemplate{navigation symbols}{}
+%   \setbeamertemplate{caption}[numbered]
+%   \setbeamertemplate{footline}[frame number]
+% } 
+%\usetheme{Madrid}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath}
+%\usepackage{vector}
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+\title[Probability and Statistics]{Cluster Analysis}
+\author{Lucy Ng'ang'a}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\begin{frame}
+\maketitle
+\end{frame}
+%\begin{frame}{Outline}
+%\tableofcontents
+%\end{frame}
+
+%\section{Cluster Analysis}
+\begin{frame}[fragile]{What is Cluster Analysis?}
+\begin{block}{}
+\begin{itemize}
+\item Cluster Analysis is a collection of numerical and statistical techniques with a common goal of uncovering or discovering groups or clusters of observations that are homogeneous/similar and separated from other groups.
+\item The objective is to group the observation into clusters that share similar characteristics by some measure of similarity.
+\end{itemize}
+\end{block}
+\begin{block}{Clustering Methods}
+\begin{itemize}
+\item  Hierarchical techniques
+\item  K-Means clustering 
+\item  Model based clustering
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+\begin{frame}{Clustering objectives}
+
+\begin{block}{}
+There are several ways to measure  similarity
+\begin{enumerate}
+\item Measure of similarity between observations.We need to measure how similar two observations are to one another.(inter cluster similarity)
+\item Measure of similarity between clusters or groups.We need to measure how similar two clusters are to one another.(intra cluster similarity)
+\end{enumerate}
+\end{block}
+\begin{block}{Objectives}
+\begin{itemize}
+\item Minimize the inter-cluster similarities
+\item Maximize the intra-cluster similarities
+\end{itemize}
+A good clustering algorithms can be evaluated on the above two objectives. i.e. Having a high intra-cluster similarity and a low inter-cluster similarity.
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Applications}
+\begin{itemize}
+\item \textbf{Marketing} a marketing department can use clustering to segment customers by personal attributes. As a result of this, different marketing campaigns targeting various types of customers can be designed.
+\item \textbf{Medical diagnosis} Medical symptoms and results clustering is useful in uncovering diagnosis.
+\item \textbf{Data and text mining and search machine results}
+\item \textbf{Pattern and Voice recognition}
+\end{itemize}
+\begin{block}{Clustering Scenarios}
+\begin{enumerate}
+\item Law enforcement stations of patrol vans so that high crime areas are in vicinity of the patrol vans. These can be found by finding the center of a high crime cluster.
+\item Location of network towers can be found by a clustering algorithm so that all its users can receive optimum signal strengths.
+\end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Example}
+\begin{block}{}
+Consider the following data set \textit{Iris} containing sepal and petal measurement of 3 species of iris plant.
+<<iris>>=
+library(MASS)
+iris<-iris
+@
+\end{block}
+\begin{block}{How to  measure of association}
+\begin{itemize}
+\item \textbf{Euclidean Distance.} In two dimensions,it is simply measure the distances between the pairs of points. More generally we can use the following equation. $$ d(x_{i},x_{j})=\sqrt{\sum_{i=k}^p(x_{ij}-x_{ik})^2}$$ is the distance between $x_{ik}$ and $x_{jk}$. p represents the count of variables.The distance between the cluster center and the data points is the Euclidean distance
+\item \textbf{Manhattan distance} is the distance between the cluster center and the data points is the sum of the absolute values of the distances.
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+\begin{frame}[fragile]{Why Euclidean Distance?}
+\begin{block}{}
+\begin{itemize}
+\item Euclidean distance are preferred than Manhattan distances because they are non negative.
+\item Euclidean distances between each pair of individuals can be be arranged in a matrix that is symmetric because $d_{ij}=d_{ji}$ and has zeros on the main diagonal.such a matrix is the starting point of many cluster analysis.
+\item Calculations of euclidean distances from the raw data may not be sensible when the variables are on different scales. The variables are first standardized before calculating the distances.
+\end{itemize}
+\end{block}
+\begin{block}{}
+<<scatterplot>>=
+scp=plot(iris$Petal.Length,iris$Petal.Width)#a scatter plot 
+# To calculate distances the factor variable in the data has to be removed
+data=iris
+data$Species=NULL
+edd=dist(iris)
+summary(edd)
+@
+
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Standardize the data}
+\begin{block}{}
+To Standardize the data 
+<<stardization>>=
+apply(data,2,var) #calculates variance of each variable if significantly different then normalization is necessary
+a=apply(data,2,mean)
+b=apply(data,2,sd)
+iris_std=scale(data,a,b)
+ed=dist(iris_std)
+summary(ed)
+@
+\end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]{Agglomerative hierarchical clustering}
+\begin{block}{}
+\begin{itemize}
+\item This class of clustering methods produces a hierarchical classification of data.Classifications consist of a series of partitions that may run from a single cluster containing all individuals to n clusters each containing a single individual.
+\item That is, we start by defining each data point to be a cluster and combine existing clusters at each step and eventually into a single cluster that contains all individuals.
+\item It is therefore necessary for the investigator to decide the number of clusters.The problem is to deciding the "correct" number of clusters.
+\end{itemize}
+\end{block}
+
+\begin{block}{Cluster dendrogram}
+Hierarchieal clustering is represented by a two way dimensional diadram known as \textbf{dendrogram}. It illustrates fusions made at each stage of statistical analysis.
+<<dendrogram>>=
+hc=hclust(ed)
+plot(hc, hang = -1)#warning not appropriate for large n
+@
+\end{block}
+\end{frame}
+
+
+\begin{frame}
+\begin{block}{Methods of combining clusters}
+\begin{itemize}
+\item \textbf{Single Linkage;}we define the distance between two clusters to be the minimum distance between any single data point in the first cluster and any single data point in the second cluster. On the basis of this definition of distance between clusters, at each stage of the process we combine the two clusters that have the smallest single linkage distance.
+\item \textbf{Complete linkage;} we define the distance between two clusters to be the maximum distance between any single data point in the first cluster and any single data point in the second cluster. On the basis of this definition of distance between clusters, at each stage of the process we combine the two clusters that have the smallest complete linkage distance.
+\item \textbf{Average Linkage;}we define the distance between two clusters to be the average distance between data points in the first cluster and data points in the second cluster. On the basis of this definition of distance between clusters, at each stage of the process we combine the two clusters that have the smallest average linkage distance.
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{Decision on the number of clusters}
+\begin{block}{Choice on number of clusters}
+One informal approach to determine the number of the clusters is to examine the changes in the height in the dendrogram. A large change indicates the appropriate number of clusters in the data.
+<<dend>>=
+plot(hclust(ed,method="complete"))
+@
+
+\end{block}
+\begin{block}{Assigning Membership}
+Assigning membership based on 3 clusters
+<<>>=
+members=cutree(hc,3)
+@
+Calculating cluster means
+<<>>=
+std_mean=aggregate(iris_std,list(members),mean)
+aggregate(data,list(members),mean)
+@
+
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Comparing the Results}
+\begin{block}{Comparisons}
+\begin{itemize}
+\item Bind the clusters membership with the data
+\item Ploting a scatter plot using two variables
+\item Compare with the three known categories
+\end{itemize}
+
+<<comparison>>=
+new=cbind(iris,members)
+scp1=plot(new$Petal.Length,new$Petal.Width,col=new$members)
+scp2=plot(iris$Petal.Length,iris$Petal.Width, col=iris$Species)
+table(iris$Species,new$members)
+@
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{K-means Clustering}
+\begin{block}{Definition}
+\begin{itemize}
+\item K-means clustering is a non-hierarchical approach thus we do not have to calculate the distance measures between all pairs of subjects.Therefore, this procedure seems much more efficient or practical when you have very large datasets.
+\item Under this k-means clustering you need to pre-specifiy how many clusters you want to consider. The commonly used implementation is one that tries to find the partion of n individuals into k groups that minimize the \textit{within group sum of squares} over all variables.
+\end{itemize}
+\end{block}
+\begin{block}{Implementation on iris data}
+<<>>=
+km=kmeans(iris_std,3)
+km$size
+km$withinss
+
+@
+
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretation of the results}
+<<>>=
+km
+@
+\end{frame}
+
+\begin{frame}[fragile]{Evaluating  and determining K}
+<<screplot>>=
+table(iris$Species,km$cluster)
+wss=(nrow(iris_std)-1)*sum(apply(iris_std,2,var))
+for (i in 2:10)
+ wss[i]=sum(kmeans(iris_std,centers = i)$withinss)
+plot(1:10,wss,type = "b",xlab = "Number of Clusters",
+     ylab = "Within group ss")
+@
+\begin{block}{}
+\begin{itemize}
+\item To determine the number of groups k, one needs to examine a scree plot. A scree plot is a simple line segment plot that shows the fraction of total variance in the data as explained or represented by number of clusters.
+To plot one one needs to calculate the within group sum of squares
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Model Based Clustering}
+\begin{block}{}
+\begin{itemize}
+\item The hierarchical and k-means clustering methods are based largely on heuristic but intuitively reasonable procedures but not formal models for clustering structure in the data. Thus problems such as deciding between methods and estimating the number of clusters difficult.
+\item The key advantage of model-based approach, compared to the standard clustering methods (k-means, hierarchical clustering, etc.), is the suggestion of the number of clusters and an appropriate model.
+\item Model based clustering assumes that the population consists of a number of sub populations each having variables with different multivariate pdf, resulting in what is known as \textbf{finite mixture density} for the population as whole.
+
+\item Each cluster k is centered at the means, with increased density for points near the mean. Geometric features (shape, volume, orientation) of each cluster are determined by the covariance matrix.
+
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Model Based Clustering}
+\begin{block}{Implementation in R}
+<<>>=
+library(mclust)
+clPairs(data,iris$Species)
+BIC=mclustBIC(data)
+plot(BIC)
+summary(BIC)
+@
+\end{block}
+Mclust uses an identifier for each possible parametrization of the covariance matrix that has three letters: E for "equal", V for "variable" and I for "coordinate axes". The first identifier refers to volume, the second to shape and the third to orientation.
+\end{frame}
+
+\begin{frame}[fragile]{Model Based Clustering}
+<<>>=
+summary(BIC)
+mod1=Mclust(data,x=BIC)
+a=summary(mod1)
+plot(mod1, what="classification")
+plot(mod1, what="density")
+table(iris$Species,mod1$classification)
+@
+
+\end{frame}
+
+\begin{frame}[fragile]{Model Based Clustering}
+Bayesian information criterion (BIC)  is a criterion for model selection among a finite set of models; the model with the lowest BIC is preferred. It is based, in part, on the likelihood function 
+\begin{equation}
+BIC=\frac{1}{n}(RSS-log(n)d\hat{\sigma}^{2})
+\end{equation}
+Calculate the residual sum of squares and then add an adjustment term which is the log of the number of observations times d, which is the number of parameters in the model.
+<<>>=
+mod2=mclustICL(data)
+summary(mod2)
+plot(mod2)
+@
+
+\end{frame}
+
+\begin{frame}[fragile]{Model Based Algorithms}
+\begin{itemize}
+\item Integrated Complete-data Likelihood(ICL) is another criterion of selecting the best model for model-based hierarchical clustering.
+\item Convex Clustering is another alogorithm that perform k-means clustering and other machine learning algorithms
+\end{itemize}
+<<>>=
+library(flexclust)
+library(mvtnorm)
+cc=cclust(iris_std,k=3,dist= "euclidean", 
+          method = "kmeans",save.data=TRUE)
+plot(cc,hull=FALSE,col=rep("black",3))
+cc
+@
+
+\end{frame}
+
+\begin{frame}[fragile]{Comparing clustering algorithms}
+After fitting data into clusters using different clustering methods, you may wish to measure the accuracy of the clustering. In most cases, you can use either intracluster or intercluster metrics as measurements. The higher the intercluster distance, the better it is, and the lower the intracluster distance, the better it is.
+\begin{itemize}
+\item The within.cluster.ss measurement stands for the within clusters sum of squares and the smaller the value, the more closely related objects are within the cluster.
+\item The avg.silwidth is a measurement that considers how closely related objects are within the cluster and how clusters are separated from each other. The silhouette value usually ranges from 0 to 1; a value closer to 1 suggests the data is better clustered.
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]{Comparing clustering algorithms}
+<<>>=
+library(fpc)
+cs1= cluster.stats(dist(iris[1:4]), mod1$classification)
+cs1[c("within.cluster.ss","avg.silwidth")]
+cs2= cluster.stats(dist(iris[1:4]), km$cluster)
+cs2[c("within.cluster.ss","avg.silwidth")]
+@
+\end{frame}
+
+\end{document}
+
+
+
+

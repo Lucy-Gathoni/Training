@@ -1,0 +1,26 @@
+\frametitle{Comparing clustering algorithms}
+\begin{Schunk}
+\begin{Sinput}
+> library(fpc)
+> cs1= cluster.stats(dist(iris[1:4]), mod1$classification)
+> cs1[c("within.cluster.ss","avg.silwidth")]
+\end{Sinput}
+\begin{Soutput}
+$within.cluster.ss
+[1] 154.947
+
+$avg.silwidth
+[1] 0.6867351
+\end{Soutput}
+\begin{Sinput}
+> cs2= cluster.stats(dist(iris[1:4]), km$cluster)
+> cs2[c("within.cluster.ss","avg.silwidth")]
+\end{Sinput}
+\begin{Soutput}
+$within.cluster.ss
+[1] 86.42692
+
+$avg.silwidth
+[1] 0.5061527
+\end{Soutput}
+\end{Schunk}
