@@ -1,0 +1,27 @@
+\frametitle{Principal components regression}
+\begin{block}{Draw backs}
+\begin{itemize}
+\item A typical mistake is to consider PCR a feature selection method. PCR is not a feature selection method because each of the calculated principal components is a linear combination of the original variables.\\
+\item Using principal components instead of the actual features can make it harder to explain what is affecting what.\\
+\item Rigorous process when making predictions on the dependent variable.
+\end{itemize}
+\end{block}
+To perform  a principal component regression in R
+\begin{Schunk}
+\begin{Sinput}
+> library(pls)
+> pcr_model <- pcr(Sepal.Length~., data = iris_num, scale = TRUE)
+> summary(pcr_model)
+\end{Sinput}
+\begin{Soutput}
+Data: 	X dimension: 150 3
+	Y dimension: 150 1
+Fit method: svdpc
+Number of components considered: 3
+TRAINING: % variance explained
+              1 comps  2 comps  3 comps
+X               74.05    98.84   100.00
+Sepal.Length    57.97    78.47    85.86
+\end{Soutput}
+\end{Schunk}
+

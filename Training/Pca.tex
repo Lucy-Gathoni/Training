@@ -1,0 +1,428 @@
+\documentclass[10pt]{beamer}
+\usetheme{CambridgeUS}
+\setbeamercolor{itemize item}{bg=green}
+\setbeamertemplate{enumerate item}[default]
+\setbeamertemplate{navigation symbols}{}
+\setbeamercovered{transparent}
+\setbeamercolor{block title}{fg=blue}
+\setbeamercolor{local structure}{fg=darkred}
+\setbeamertemplate{itemize item}[triangle]
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{mathtools}
+
+\title[Probability and Statistics]{Principal component analysis}
+\author{Lucy Ng'ang'a}
+\usepackage{Sweave}
+\begin{document}
+\input{Pca-concordance}
+
+\begin{frame}
+\maketitle
+\end{frame}
+
+\begin{frame}{Principal Components Analysis}
+\begin{block}{Introduction}
+\begin{itemize}
+\item Sometimes data are collected on a large number of variables from a single population, this is usually known as the curse of dimensionality. With a large number of variables, the dispersion matrix may be too large to study and interpret properly.
+\item There would be too many pairwise correlations between the variables to consider. Graphical display of data may also not be of particular help in case the data set is very large. 
+\item To interpret the data in a more meaningful form, it is therefore necessary to reduce the number of variables(\textit{dimensionality}) to a few, interpretable linear combinations of the data. Each linear combination will correspond to a principal component.
+\item The principal components analysis is specifically useful in regression in \textbf{reducing the number of predictor variables} and dealing with \textbf{correlated predictor variables/Multicollinearity}.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Principal Components}
+Suppose that we have a random vector $X^{T}=(X_{1},X_{2},....,X_{p})$ with a population variance-covariance matrix 
+$$ Var(X)=\sum =
+\begin{bmatrix}
+\sigma_{11}^{2} & \sigma_{12}&\cdots & \sigma_{1p} \\
+\sigma_{21}& \sigma_{22}^{2}& \cdots& \sigma_{2p} \\
+\vdots& \vdots&\ddots&\vdots\\
+ \sigma_{p1}& \sigma_{p2}& \cdots& \sigma_{pp}^{2}
+ \end{bmatrix}$$
+ ?????????Consider the linear combinations 
+ \begin{center}
+ $$Y_{1}=e_{11}X_{1}+e_{12}X_{2}+\cdots+e_{1p}X_{p}$$
+ $$Y_{2}=e_{21}X_{1}+e_{22}X_{2}+\cdots+e_{2p}X_{p}$$
+ $$\vdots$$
+ $$Y_{p}=e_{p1}X_{1}+e_{p2}X_{2}+\cdots+e_{pp}X_{p}$$
+ \end{center}???
+ \end{frame}
+ 
+ \begin{frame}{Principal Components Analysis}
+ Each of the $Y_{i}$ is a function of random data and thus it is random. With a population variance of 
+ $$ Var(Y_{i})=\sum_{k=1} \sum_{l=1} e_{ik}e_{il}\sigma_{kl}=e_{i}^{'}\sum e_{i}$$
+ Moreover the covariance of $Y_{i}$ and $Y_{j}$ will have a population covariance
+ $$ Cov(Y_{i},Y_{j})=\sum_{k=1} \sum_{l=1} e_{ik}e_{jl}\sigma_{kl}=e_{i}^{'}\sum e_{j}$$
+ And the coefficients $e_{ij}$ are collected into a vector
+ $$e_{i}^{T}=(e_{i1},e_{i2},\cdots,e_{ip})$$
+ 
+\end{frame}
+\begin{frame}{First Principal Component}
+\begin{itemize}
+\item The First principal component is a linear combination of original variables which captures the maximum variance in the data set. It determines the direction of highest variability in the data. Larger the variability captured in first component, larger the information captured by component.\\
+\item It is a a line which is closest to the data i.e. it minimizes the sum of squared distance between a data point and the line.\\
+\item Mathematically, we select $e_{1}^{T}=(e_{11},e_{12},\cdots,e_{1p})$ that maximizes 
+$$ Var(Y_{1})=\sum_{k=1} \sum_{l=1} e_{1k}e_{1l}\sigma_{kl}=e_{1}^{'}\sum e_{1}$$ 
+\item Subject to the constraint $$e_{1}^{'}e_{1}=\sum_{j=1}^{p}e_{1j}^{2}=1$$
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Second Principal Component}
+\begin{itemize}
+\item The second principal component $Y_{2}$ is also a linear combination of original variables which captures the remaining variance in the data set and is uncorrelated with $Y_{1}$.
+\item Because the two components are uncorrelated, their directions should be orthogonal.
+\item Mathematically, we select $e_{2}^{T}=(e_{21},e_{22},\cdots,e_{2p})$ that maximizes 
+$$ Var(Y_{2})=\sum_{k=1} \sum_{l=1} e_{2k}e_{2l}\sigma_{kl}=e_{2}^{'}\sum e_{2}$$ 
+\item Subject to the constraint $$e_{2}^{'}e_{2}=\sum_{j=1}^{p}e_{2j}^{2}=1$$
+\item With the additional constraint $$ Cov(Y_{1},Y_{2})=\sum_{k=1} \sum_{l=1} e_{1k}e_{2l}\sigma_{kl}=e_{1}^{'}\sum e_{2}=0$$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The ith Principal Component}
+\begin{itemize}
+ 
+\item We select $e_{i}^{T}=(e_{i1},e_{i2},\cdots,e_{ip})$ that maximizes 
+$$ Var(Y_{i})=\sum_{k=1} \sum_{l=1} e_{ik}e_{il}\sigma_{kl}=e_{i}^{'}\sum e_{i}$$ 
+\item Subject to the constraint $e_{i}^{'}e_{i}=\sum_{j=1}^{p}e_{ij}^{2}=1$
+\item With the additional constraint 
+\begin{center}
+$$ Cov(Y_{1},Y_{i})=\sum_{k=1} \sum_{l=1} e_{1k}e_{il}\sigma_{kl}=e_{1}^{'}\sum e_{i}=0$$
+$$ Cov(Y_{2},Y_{i})=\sum_{k=1} \sum_{l=1} e_{2k}e_{il}\sigma_{kl}=e_{2}^{'}\sum e_{i}=0$$
+$$\vdots$$
+$$ Cov(Y_{i-1},Y_{i})=\sum_{k=1} \sum_{l=1} e_{i-1,k}e_{il}\sigma_{kl}=e_{i-1}^{'}\sum e_{i}=0$$
+\end{center}
+\item Therefore all principal components are uncorrelated with one another.
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The calculation of the Coefficients}
+\begin{itemize}
+\item  We find the coefficients $e_{ij}$ for a principal component by calculating the  eigenvalues and eigenvectors of the variance-covariance matrix $\sum$.
+\item  Let $\lambda_{1}$ through $\lambda_{p}$ denote the eigenvalues of the variance-covariance matrix $\sum$.With the corresponding eigenvectors $e_{1}$ through to $e_{p}$. 
+\item These are ordered so that $\lambda_{1}$ has the largest eigenvalue and $\lambda_{p}$ is the smallest.
+$$\lambda_{1} \geq \lambda_{2}\geq, \cdots \geq \lambda_{p}$$
+\item The elements for these eigenvectors will be the coefficients of our principal components.
+\item The variance for the ith principal component is equal to the ith eigenvalue. 
+$$Var(Y_{i}=Var(e_{i1}X_{1}+e_{i2}X_{2}+\cdots+e_{ip}X_{p})=\lambda_{i}$$
+\item Moreover, the principal components are uncorrelated with one another.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Spectral Decomposition}
+\begin{itemize}
+\item The variance-covariance matrix may be written as a function of the eigenvalues and their corresponding eigenvectors. This is determined by using the Spectral Decomposition Theorem. 
+\item Spectral Decomposition Theorem states that the variance-covariance matrix can be written as the sum over the p eigenvalues, multiplied by the product of the corresponding eigenvector times its transpose.
+$\sum=\sum_{i=k}^{p}\lambda_{i}e_{i}^{'}e_{i}$
+\item The total variation of $X$ is the trace of the variance-covariance matrix, or if you like, the sum of the variances of the individual variables. This is also equal to the sum of the eigenvalues.$$trace(\sum)=\sigma_{11}^{2}+\cdots+\sigma_{11}^{2}=\lambda_{1}+\cdots+\lambda_{p}$$
+\item The proportion of variation explained by the ith principal component is then going to be defined to be the eigenvalue for that component divided by the sum of the eigenvalues.$$\dfrac{\lambda_{i}}{\lambda_{1}+\cdots+\lambda_{p}}$$
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Covariance or Correlation Matrix}
+\begin{itemize}
+\item Principal components analysis is not scale invariant. That is, it is influenced by the scale of measurements. 
+\item In situations where the multivariate data has variables that are of completely different types, then the principle components from the variance covariance matrix will depend upon the choice of measurements.
+\item Additionally, if there are large differences between the variances of the original variables, those with large variances will tend to dorminate the early components.
+\item Therefore, the principle components are extracted from the correlation matrix \textbf{R}.This is equivalent with to extracting the components from hte covariance matrix after standardizing the variables.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{}
+Consider the data set iris 
+\begin{Schunk}
+\begin{Sinput}
+> library(MASS)
+> iris<-iris
+> iris_num=iris[,1:4]#removing the factor variable.
+> apply(iris_num,2,var)
+\end{Sinput}
+\begin{Soutput}
+Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+   0.6856935    0.1899794    3.1162779    0.5810063 
+\end{Soutput}
+\begin{Sinput}
+> library(psych)
+> pairs.panels(iris[,-5],gap=0,
++              bg=c("red","yellow","blue")[iris$Species])
+\end{Sinput}
+\end{Schunk}
+The later plot shows the multicolliearity of the four numerical variables.
+\end{frame}
+
+\begin{frame}[fragile]{Implementation in R}
+\begin{Schunk}
+\begin{Sinput}
+> pc=prcomp(iris_num,center = TRUE,scale. = TRUE)
+> pc$rotation #prints all the principal components
+\end{Sinput}
+\begin{Soutput}
+                    PC1         PC2        PC3        PC4
+Sepal.Length  0.5210659 -0.37741762  0.7195664  0.2612863
+Sepal.Width  -0.2693474 -0.92329566 -0.2443818 -0.1235096
+Petal.Length  0.5804131 -0.02449161 -0.1421264 -0.8014492
+Petal.Width   0.5648565 -0.06694199 -0.6342727  0.5235971
+\end{Soutput}
+\begin{Sinput}
+> summary(pc)
+\end{Sinput}
+\begin{Soutput}
+Importance of components:
+                          PC1    PC2     PC3     PC4
+Standard deviation     1.7084 0.9560 0.38309 0.14393
+Proportion of Variance 0.7296 0.2285 0.03669 0.00518
+Cumulative Proportion  0.7296 0.9581 0.99482 1.00000
+\end{Soutput}
+\begin{Sinput}
+> iris_pc=pc$x #calls the 
+\end{Sinput}
+\end{Schunk}
+\end{frame}
+
+\begin{frame}[fragile]{Analysis of components}
+\begin{itemize}
+\item The first componenet explains 72.96\% of the variability and first and second components 95.81\%.
+\item The variable sepal.width had a neggative correlation with all the components. This is due to the fact that it had the least variance.
+\item The components are now uncorrelated
+\end{itemize}
+\begin{Schunk}
+\begin{Sinput}
+> cor(pc$x)
+\end{Sinput}
+\begin{Soutput}
+              PC1           PC2           PC3           PC4
+PC1  1.000000e+00  2.906325e-16 -4.776167e-16  2.153446e-15
+PC2  2.906325e-16  1.000000e+00  9.341844e-17 -2.309745e-16
+PC3 -4.776167e-16  9.341844e-17  1.000000e+00 -1.384981e-15
+PC4  2.153446e-15 -2.309745e-16 -1.384981e-15  1.000000e+00
+\end{Soutput}
+\begin{Sinput}
+> pairs.panels(pc$x,gap=0,
++              bg=c("red","yellow","blue")[iris$Species])
+\end{Sinput}
+\end{Schunk}
+
+\end{frame}
+
+\begin{frame}[fragile]{Bi-plot}
+A biplot is a graphical representation of the variances and covariances of the variables and the distances between units.
+\begin{Schunk}
+\begin{Sinput}
+> biplot(pc,col=c("red","blue"))
+\end{Sinput}
+\end{Schunk}
+\begin{itemize}
+\item The distance between the points representing the units reflects the generalized distance between the points.
+\item The length of the vector from the origin to the coordinates representing a particular variables reflects the variance of that variable.
+\item The correlation of two variables is reflected by the angle between the two corresponding vectors for the two variables. The greater the angle the greater the correlation.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Choice of Components}
+There are informal and formal ways in answering the question of how many components are needed.
+\begin{enumerate}
+\item Retain just enough components to explain some specified large percentages of the total variation of the original variables. Values between 75\%and 95\% are  suggested.
+\item Exclude the principal components whose eigenvalues (variance) are less than than the average of the eigenvalues. If the correlation matrix was used to extract the components then the average variance is 1.
+\item Examine the plot of the eigenvalues($\lambda_{i}$) against the variables (\textit{i}). The number of components selected is the value of \textit{i} that corresponds to an "elbow" in the curve. i.e. a change of slope from steep to shallow
+\end{enumerate}
+\begin{Schunk}
+\begin{Sinput}
+> plot(pc,type = "l")#plots the scree plot
+\end{Sinput}
+\end{Schunk}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Example in Regression}
+In multiple regression,we assume that the explanatory/predictor variables are independent. If the independent variables are correlated then the regression coefficients are unstable.
+\begin{Schunk}
+\begin{Sinput}
+> data=read.csv("multicollinear_pca.csv")
+> str(data)
+\end{Sinput}
+\begin{Soutput}
+'data.frame':	20 obs. of  4 variables:
+ $ x1: num  19.5 24.7 30.7 29.8 19.1 25.6 31.4 27.9 22.1 25.5 ...
+ $ x2: num  43.1 49.8 51.9 54.3 42.2 53.9 58.5 52.1 49.9 53.5 ...
+ $ x3: num  29.1 28.2 37 31.1 30.9 23.7 27.6 30.6 23.2 24.8 ...
+ $ y : num  11.9 22.8 18.7 20.1 12.9 21.7 27.1 25.4 21.3 19.3 ...
+\end{Soutput}
+\end{Schunk}
+The \textbf{Response (y)} is a measure for the amount of fat in a human body.
+\begin{center}
+$x_{1}$ is triceps skin fold thickness\\
+$x_{2}$ is thigh circumference\\
+$x_{3}$ is mid arm circumference\\
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Example in Regression}
+Fitting  several linear regressions
+\begin{Schunk}
+\begin{Sinput}
+> fit1=lm(y~x1,data=data)
+> fit2=lm(y~x2,data=data)
+> fit3=lm(y~x1+x2,data=data)
+> fit4=lm(y~x1+x1+x3,data=data)
+\end{Sinput}
+\end{Schunk}
+The results can be summarized in the following table
+\begin{tabular}{|c|c|c|c|}
+	\hline 
+Fit	& $\beta_{1}$ & $\beta_{2}$ & $\beta_{3}$ \\ 
+	\hline 
+1	& 0.8572(0.1288) &  &  \\ 
+	\hline 
+2	&  & 0.8565(0.1100) &  \\ 
+	\hline 
+3	& 0.2224(0.3034) & 0.6594(0.2912) &  \\ 
+	\hline 
+4	& 4.334 (3.016) & -2.857(2.582) &  -2.186(1.595)\\ 
+	\hline 
+\end{tabular}\\
+We cannot account for the increasing standard errors.
+\end{frame}
+
+\begin{frame}[fragile]{Example in Regression}
+Taking a look at the correlation of the predictor variables 
+\begin{Schunk}
+\begin{Sinput}
+> cor(data[,-4])
+\end{Sinput}
+\begin{Soutput}
+          x1        x2        x3
+x1 1.0000000 0.9238425 0.4577772
+x2 0.9238425 1.0000000 0.0846675
+x3 0.4577772 0.0846675 1.0000000
+\end{Soutput}
+\begin{Sinput}
+> pairs.panels(data, gap=0)
+\end{Sinput}
+\end{Schunk}
+\begin{itemize}
+\item All the three variables are correlated to one another leading to inflation of variances of the predictor variables.
+\item To multicollinearity we can fit a linear regression to the three components extracted from the data. Principal independent components are independent of one another.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Example in Regression}
+To extract the principle components
+\begin{Schunk}
+\begin{Sinput}
+> pcr=prcomp(data[,-4],center = TRUE,scale. = TRUE)
+> pcr$rotation
+\end{Sinput}
+\begin{Soutput}
+         PC1         PC2        PC3
+x1 0.6946957 -0.05010563  0.7175565
+x2 0.6294279 -0.44050902 -0.6401347
+x3 0.3481645  0.89634883 -0.2744818
+\end{Soutput}
+\begin{Sinput}
+> summary(pcr)
+\end{Sinput}
+\begin{Soutput}
+Importance of components:
+                          PC1    PC2     PC3
+Standard deviation     1.4375 0.9658 0.02696
+Proportion of Variance 0.6888 0.3109 0.00024
+Cumulative Proportion  0.6888 0.9998 1.00000
+\end{Soutput}
+\begin{Sinput}
+> pairs.panels(pcr$x,gap=0)
+\end{Sinput}
+\end{Schunk}
+
+\end{frame}
+
+\begin{frame}[fragile]{Example in Regression}
+To fit a regression line to the components
+\begin{Schunk}
+\begin{Sinput}
+> fit5=lm(y~pcr$x, data=data)
+> summary(fit5)
+\end{Sinput}
+\begin{Soutput}
+Call:
+lm(formula = y ~ pcr$x, data = data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.7263 -1.6111  0.3923  1.4656  4.1277 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  20.1950     0.5545  36.418  < 2e-16 ***
+pcr$xPC1      2.9358     0.3958   7.418 1.46e-06 ***
+pcr$xPC2     -1.6498     0.5891  -2.801   0.0128 *  
+pcr$xPC3     27.3834    21.1066   1.297   0.2129    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.48 on 16 degrees of freedom
+Multiple R-squared:  0.8014,	Adjusted R-squared:  0.7641 
+F-statistic: 21.52 on 3 and 16 DF,  p-value: 7.343e-06
+\end{Soutput}
+\end{Schunk}
+
+\end{frame}
+
+\begin{frame}[fragile]{Principal components regression}
+\begin{block}{Definition and Assumption}
+Principal components regression (PCR) is a regression technique based on principal component analysis (PCA).The basic idea behind PCR is to calculate the principal components and then use some of these components as predictors in a linear regression model fitted using the typical least squares procedure.\\
+A core assumption of PCR is that the directions in which the predictors show the most variation are the exact directions associated with the response variable.
+\end{block}
+\begin{block}{Advantages}
+\begin{itemize}
+\item Dimensionality reduction
+\item Avoidance of multicollinearity between predictors
+\item Overfitting mitigation
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Principal components regression}
+\begin{block}{Draw backs}
+\begin{itemize}
+\item A typical mistake is to consider PCR a feature selection method. PCR is not a feature selection method because each of the calculated principal components is a linear combination of the original variables.\\
+\item Using principal components instead of the actual features can make it harder to explain what is affecting what.\\
+\item Rigorous process when making predictions on the dependent variable.
+\end{itemize}
+\end{block}
+To perform  a principal component regression in R
+\begin{Schunk}
+\begin{Sinput}
+> library(pls)
+> pcr_model <- pcr(Sepal.Length~., data = iris_num, scale = TRUE)
+> summary(pcr_model)
+\end{Sinput}
+\begin{Soutput}
+Data: 	X dimension: 150 3 
+	Y dimension: 150 1
+Fit method: svdpc
+Number of components considered: 3
+TRAINING: % variance explained
+              1 comps  2 comps  3 comps
+X               74.05    98.84   100.00
+Sepal.Length    57.97    78.47    85.86
+\end{Soutput}
+\end{Schunk}
+
+\end{frame}
+\begin{frame}{Exercises}
+\begin{block}{Correlation Matrix}
+Given MacDonnels correartion matrix, from the measurements of seven physical characteristics of 5000 convicted men, perform principal component analysis and interpret the derived components.
+\end{block}
+Given the US air Pollution data.
+\begin{itemize}
+\item Construct a diagram that shows the SO2 variable plotted against each of the six explanatory variables and in each of the scatter plot show the fitted linear regression. Does this diagram help in deciding on the most appropriate model for determining the variables most predictive of SO2.
+\item Perform a principle component regression after removing whatever cities you think should be regarded as outliers. Produce scatter plots of SO2 against each of the principle component scores. Interpret your results. 
+\end{itemize}
+\end{frame}
+\end{document}
